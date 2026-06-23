@@ -1,0 +1,6 @@
+{
+  "name": "English AI Master",
+  "description": "0 dan IELTS 9.0 gacha ingliz tilini premium AI ustoz bilan o'rganing",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
