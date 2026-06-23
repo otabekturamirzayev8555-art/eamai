@@ -4,17 +4,14 @@ workflows:
     max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
-      groups:
-        - android-signing
       vars:
         JAVA_VERSION: "17"
     scripts:
-      - name: Set up local.properties
-        script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
       - name: Build Android APK
         script: |
+          # Loyiha qaysi papkada bo'lsa, o'sha yerga o'tish va yig'ish
+          cd $(dirname $(find . -name "build.gradle" -print -quit))
           chmod +x gradlew || true
           ./gradlew assembleDebug
     artifacts:
-      - app/build/outputs/apk/debug/*.apk
+      - "**/build/outputs/apk/debug/*.apk"
