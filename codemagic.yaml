@@ -7,9 +7,8 @@ workflows:
       vars:
         JAVA_VERSION: "17"
     scripts:
-      - name: Debug Project Structure
+      - name: Build Android APK
         script: |
-          echo "=== HOZIRGI PAPKADAGI FAYLLAR ==="
-          ls -la
-          echo "=== LOYIHA ICHIDAGI BARCHA PAPKALAR ==="
-          find . -maxdepth 3 -type d
+          gradle assembleDebug
+    artifacts:
+      - app/build/outputs/apk/debug/*.apk
