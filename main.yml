@@ -5,7 +5,7 @@ on:
     branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
-  workflow_dispatch: # Bu tugma orqali o'zingiz ham xohlagan payt qo'lda buildni boshlay olasiz
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,17 +20,15 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-          cache: 'gradle' # Gradle keshlash tizimini yoqadi, shunda keyingi safar tezroq build bo'ladi
+          cache: 'gradle'
 
       - name: Write local.properties
         run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
 
-      - name: Initialize Gradle Wrapper
+      - name: Initialize Gradle Wrapper (9.3.1)
         run: |
-          if [ ! -f "gradlew" ]; then
-            echo "Gradle wrapper topilmadi. Yangitdan yaratilmoqda..."
-            gradle wrapper --gradle-version 8.10.2
-          fi
+          # Loyihangiz talab qilgan eng minimal versiyani majburiy o'rnatamiz
+          gradle wrapper --gradle-version 9.3.1
           chmod +x gradlew
 
       - name: Build Android Debug APK
@@ -41,4 +39,4 @@ jobs:
         with:
           name: English-AI-Master-Debug-APK
           path: app/build/outputs/apk/debug/*.apk
-          retention-days: 7 # Fayl GitHub'da 7 kun davomida yuklab olish uchun saqlanib turadi
+          retention-days: 7
