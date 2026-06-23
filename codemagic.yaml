@@ -7,12 +7,13 @@ workflows:
       vars:
         JAVA_VERSION: "17"
     scripts:
-      - name: Generate Wrapper and Build
+      - name: Force Build and Catch Error
         script: |
-          # Serverning o'zidagi gradle orqali loyihaga wrapper fayllarini majburlab o'rnatamiz
-          gradle wrapper
-          # Endi wrapperga ruxsat berib, ishga tushiramiz
+          echo "=== GRADLE WRAPPER GENERATION ===" > build_error.log
+          gradle wrapper >> build_error.log 2>&1 || true
+          
+          echo "=== ANDROID BUILD PROCESS ===" >> build_error.log
           chmod +x gradlew || true
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug >> build_error.log 2>&1 || true
     artifacts:
-      - app/build/outputs/apk/debug/*.apk
+      - build_error.log
