@@ -1,18 +1,79 @@
+# Codemagic CI/CD Configuration for English AI Master
+# Optimized for Mac Mini M1 (mac_mini_m1) instance type.
+# Aligns Java 21, Gradle 8.10.2, and AGP 9.1.1.
+
 workflows:
-  android-workflow:
-    name: Android APK Build
-    max_build_duration: 30
+  android-build:
+    name: Android Production & Debug Build
+    max_build_duration: 60
     instance_type: mac_mini_m1
+    
     environment:
+      android_sdk: latest
+      ndk: latest
       java: 21
+      vars:
+        # Prevent Gradle daemon from staying alive and consuming memory
+        GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx2048m"
+        # If keystore is defined in Codemagic UI:
+        # KEYSTORE_PATH: "/tmp/my-upload-key.jks"
+        # STORE_PASSWORD: Encrypted(...)
+        # KEY_PASSWORD: Encrypted(...)
+
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: '*'
+          include: true
+
     scripts:
-      - name: Ultimate Build
+      - name: Set up local.properties
         script: |
-          # Gradle wrapper fayllarini 9.3.1 versiyada yaratamiz
-          gradle wrapper --gradle-version 9.3.1
-          chmod +x gradlew
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+
+      - name: Validate Gradle & Java environment
+        script: |
+          echo "Checking system Java version..."
+          java -version
+          echo "Checking compiler Java version..."
+          javac -version
           
-          # Buildni boshlaymiz
-          ./gradlew assembleDebug --stacktrace
+      - name: Initialize Gradle Wrapper (If missing in repo)
+        script: |
+          # If gradlew doesn't exist, we generate it using global gradle to avoid status code 1.
+          if [ ! -f "gradlew" ]; then
+            echo "Gradle wrapper not found in repository. Generating it dynamically..."
+            gradle wrapper --gradle-version 8.10.2
+          fi
+          chmod +x gradlew
+
+      - name: Build Android Debug APK & Release Bundle
+        script: |
+          # Run compilation and package debug APK
+          ./gradlew assembleDebug --no-daemon
+          
+          # If signing credentials are set up, build the release bundle (AAB) as well
+          if [ -n "$STORE_PASSWORD" ]; then
+            echo "Signing environment detected. Building release Bundle..."
+            # Decode keystore base64 if stored in environment variable
+            if [ -n "$KEYSTORE_BASE64" ]; then
+              echo "$KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_PATH"
+            fi
+            ./gradlew bundleRelease --no-daemon
+          else
+            echo "Skipping Release Bundle build because signing credentials are not configured in Codemagic. Set up STORE_PASSWORD to enable."
+          fi
+
     artifacts:
-      - app/build/outputs/apk/debug/*.apk
+      - app/build/outputs/apk/**/*.apk
+      - app/build/outputs/bundle/**/*.aab
+
+    publishing:
+      email:
+        recipients:
+          - otabekturamirzayev8555@gmail.com
+        notify:
+          success: true
+          failure: true
