@@ -7,11 +7,9 @@ workflows:
       vars:
         JAVA_VERSION: "17"
     scripts:
-      - name: Build Android APK
+      - name: Debug Project Structure
         script: |
-          # Loyiha qaysi papkada bo'lsa, o'sha yerga o'tish va yig'ish
-          cd $(dirname $(find . -name "build.gradle" -print -quit))
-          chmod +x gradlew || true
-          ./gradlew assembleDebug
-    artifacts:
-      - "**/build/outputs/apk/debug/*.apk"
+          echo "=== HOZIRGI PAPKADAGI FAYLLAR ==="
+          ls -la
+          echo "=== LOYIHA ICHIDAGI BARCHA PAPKALAR ==="
+          find . -maxdepth 3 -type d
