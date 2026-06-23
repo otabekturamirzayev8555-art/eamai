@@ -7,8 +7,12 @@ workflows:
       vars:
         JAVA_VERSION: "17"
     scripts:
-      - name: Build Android APK
+      - name: Generate Wrapper and Build
         script: |
-          gradle assembleDebug
+          # Serverning o'zidagi gradle orqali loyihaga wrapper fayllarini majburlab o'rnatamiz
+          gradle wrapper
+          # Endi wrapperga ruxsat berib, ishga tushiramiz
+          chmod +x gradlew || true
+          ./gradlew assembleDebug
     artifacts:
       - app/build/outputs/apk/debug/*.apk
