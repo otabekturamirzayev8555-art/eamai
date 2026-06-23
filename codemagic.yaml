@@ -4,18 +4,17 @@ workflows:
     max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
-      vars:
-        # Java 21 ga ko'taramiz, chunki Gradle 9.x shuni talab qiladi
-        JAVA_HOME: /usr/lib/jvm/java-21-openjdk-amd64
+      android_ndk: 25.2.9519653
+      java: 21
     scripts:
       - name: Ultimate Build
         script: |
-          # Gradle 9.3.1 ni majburiy o'rnatamiz
+          # Gradle wrapper fayllarini talab qilingan 9.3.1 versiyada yaratamiz
           gradle wrapper --gradle-version 9.3.1
           chmod +x gradlew
           
-          # Hozirgi Java versiyasini tekshirib, buildni boshlaymiz
-          java -version
+          # Build jarayonini boshlaymiz
           ./gradlew assembleDebug --stacktrace
     artifacts:
       - app/build/outputs/apk/debug/*.apk
+      
