@@ -7,13 +7,13 @@ workflows:
       vars:
         JAVA_VERSION: "17"
     scripts:
-      - name: Force Build and Catch Error
+      - name: Upgrade Gradle and Build APK
         script: |
-          echo "=== GRADLE WRAPPER GENERATION ===" > build_error.log
-          gradle wrapper >> build_error.log 2>&1 || true
+          # Gradle wrapper fayllarini aynan talab qilingan 9.3.1 versiyada yaratamiz
+          gradle wrapper --gradle-version 9.3.1
           
-          echo "=== ANDROID BUILD PROCESS ===" >> build_error.log
-          chmod +x gradlew || true
-          ./gradlew assembleDebug >> build_error.log 2>&1 || true
+          # Unga ruxsat beramiz va build boshlaymiz
+          chmod +x gradlew
+          ./gradlew assembleDebug
     artifacts:
-      - build_error.log
+      - app/build/outputs/apk/debug/*.apk
